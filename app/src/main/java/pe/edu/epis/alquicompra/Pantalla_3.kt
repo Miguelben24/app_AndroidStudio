@@ -87,7 +87,7 @@ fun Pantalla3Onboarding2() {
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            // Sección Modalidad
+
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "¿Qué te interesa más?",
@@ -103,7 +103,7 @@ fun Pantalla3Onboarding2() {
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
-                // Opción Alquilar
+
                 ModeSelectionCard(
                     title = "Alquilar objetos",
                     description = "Renta por días, semanas o meses",
@@ -129,7 +129,7 @@ fun Pantalla3Onboarding2() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Opción Ambos
+
                 ModeSelectionCard(
                     title = "Me interesan ambos",
                     description = "Alquilar y comprar según necesite",
@@ -141,7 +141,7 @@ fun Pantalla3Onboarding2() {
                 )
             }
 
-            // Sección Ubicación
+
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "¿Dónde te encuentras?",
@@ -169,7 +169,7 @@ fun Pantalla3Onboarding2() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Ubicación manual
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -246,7 +246,7 @@ fun Pantalla3Onboarding2() {
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        // Botón continuar
+
         Button(
             onClick = {},
             modifier = Modifier
@@ -386,6 +386,6 @@ fun LocationCard(
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
-        }
+        } //migue...
     }
 }
