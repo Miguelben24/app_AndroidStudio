@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun Pantalla_10_5_2() {
+fun Pantalla_9_5_2() {
     Box(
         modifier = Modifier
             .fillMaxSize()
