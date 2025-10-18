@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 
 @Preview
 @Composable
-fun Pantalla10_5Filtros() {
+fun Pantalla9_5Filtros() {
     Column(
         modifier = Modifier
             .fillMaxSize()
