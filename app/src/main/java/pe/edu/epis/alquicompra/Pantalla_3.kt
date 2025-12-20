@@ -49,18 +49,28 @@ fun Pantalla3Login() {
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
 
+    // 🎨 Nueva paleta
+    val primary = Color(0xFF1D5D9B)
+    val primaryLight = Color(0xFF49A5D6)
+    val accent = Color(0xFFFFC727)
+    val bg = Color(0xFFF3F6F9)
+    val textDark = Color(0xFF1F2937)
+    val textLight = Color(0xFF6B7280)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(bg)
     ) {
 
+        // ------------------------------
+        // 🔵 BARRA SUPERIOR
+        // ------------------------------
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .background(Color(0xFFFAFAFA))
-                .padding(bottom = 16.dp),
+                .background(Color.White)
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -68,163 +78,174 @@ fun Pantalla3Login() {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Atrás",
-                    tint = Color(0xFF4B5563)
+                    tint = textLight
                 )
             }
+
             Text(
                 text = "Iniciar sesión",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF111827)
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = textDark
             )
+
             Box(modifier = Modifier.width(40.dp))
         }
 
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Color(0xFFF3F4F6))
-        )
+        // ---------------------------------
+        // LOGO (AQUÍ COLOCARÁS TU IMAGEN)
+        // ---------------------------------
+        Spacer(modifier = Modifier.height(20.dp))
 
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(120.dp)
+                    .background(Color.White, RoundedCornerShape(20.dp))
+            )
 
+            // 👉 AQUI VA TU LOGO (reemplazar el Box por Image)
+            // Ejemplo:
+            // Image(
+            //    painterResource(id = R.drawable.mi_logo),
+            //    contentDescription = "Logo",
+            //    modifier = Modifier.size(120.dp)
+            // )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // ------------------------------
+        // CAMPOS
+        // ------------------------------
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+
+            // 🔹 Campo correo
+            Text(
+                text = "Correo electrónico",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = textDark,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                placeholder = { Text("tu@email.com") },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = primaryLight,
+                    focusedBorderColor = primary,
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
+                )
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 🔹 Campo contraseña
+            Text(
+                text = "Contraseña",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = textDark,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Tu contraseña") },
+                visualTransformation = PasswordVisualTransformation(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = primaryLight,
+                    focusedBorderColor = primary,
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
+                )
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // ------------------------------
+            // RECORDARME / OLVIDÉ CONTRASEÑA
+            // ------------------------------
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Correo electrónico",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("tu@email.com") },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF3B82F6),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = rememberMe,
+                        onCheckedChange = { rememberMe = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = primary,
+                            uncheckedColor = textLight
                         )
                     )
+                    Text(text = "Recordarme", fontSize = 14.sp, color = textLight)
                 }
 
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Contraseña",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Tu contraseña") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF3B82F6),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
-                        )
-                    )
-                }
-
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Checkbox(
-                            checked = rememberMe,
-                            onCheckedChange = { rememberMe = it },
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = Color(0xFF3B82F6),
-                                uncheckedColor = Color(0xFFD1D5DB)
-                            )
-                        )
-                        Text(
-                            text = "Recordarme",
-                            fontSize = 14.sp,
-                            color = Color(0xFF4B5563)
-                        )
-                    }
-
-                    TextButton(onClick = {}) {
-                        Text(
-                            text = "¿Olvidaste tu contraseña?",
-                            fontSize = 14.sp,
-                            color = Color(0xFF3B82F6)
-                        )
-                    }
-                }
-
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF3B82F6)
-                    )
-                ) {
-                    Text(
-                        text = "Iniciar sesión",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
-                    )
-                }
-
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "¿No tienes cuenta? ",
-                        fontSize = 14.sp,
-                        color = Color(0xFF4B5563)
-                    )
-                    TextButton(onClick = {}) {
-                        Text(
-                            text = "Regístrate aquí",
-                            fontSize = 14.sp,
-                            color = Color(0xFF3B82F6)
-                        )
-                    }
+                TextButton(onClick = {}) {
+                    Text("¿Olvidaste tu contraseña?", color = primary)
                 }
             }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            // ------------------------------
+            // BOTÓN PRINCIPAL
+            // ------------------------------
+            Button(
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = primary
+                )
+            ) {
+                Text(
+                    text = "Ingresar",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // ------------------------------
+            // REGISTRARSE
+            // ------------------------------
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("¿No tienes cuenta?", color = textLight)
+                TextButton(onClick = {}) {
+                    Text("Regístrate", color = primary)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }
-
 // Miguel Angel Benito Chambi
