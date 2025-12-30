@@ -48,7 +48,8 @@ import androidx.compose.ui.unit.sp
 fun Pantalla7Search(
     onBackClick: () -> Unit,
     onMapViewClick: () -> Unit = {},
-    onFilterClick: () -> Unit = {}
+    onFilterClick: () -> Unit = {},
+    onProductClick: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isListView by remember { mutableStateOf(true) }
@@ -225,7 +226,8 @@ fun Pantalla7Search(
                     badge = "Disponible",
                     badgeColor = Color(0xFF10B981),
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE))
+                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE)),
+                    onClick = onProductClick // ← ESTO ES LO IMPORTANTE
                 )
 
                 SearchProductCard(
@@ -239,7 +241,8 @@ fun Pantalla7Search(
                     badge = "Negociable",
                     badgeColor = Color(0xFF3B82F6),
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0))
+                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0)),
+                    onClick = onProductClick
                 )
 
                 SearchProductCard(
@@ -253,7 +256,8 @@ fun Pantalla7Search(
                     badge = "Muy popular",
                     badgeColor = Color(0xFFF59E0B),
                     isFavorite = true,
-                    gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF))
+                    gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF)),
+                    onClick = onProductClick
                 )
 
                 SearchProductCard(
@@ -267,7 +271,8 @@ fun Pantalla7Search(
                     badge = "Disponible",
                     badgeColor = Color(0xFF10B981),
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFFECDD3), Color(0xFFFDA4AF))
+                    gradientColors = listOf(Color(0xFFFECDD3), Color(0xFFFDA4AF)),
+                    onClick = onProductClick
                 )
 
                 SearchProductCard(
@@ -281,7 +286,8 @@ fun Pantalla7Search(
                     badge = "Muy popular",
                     badgeColor = Color(0xFFF59E0B),
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE))
+                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE)),
+                    onClick = onProductClick
                 )
 
                 SearchProductCard(
@@ -295,7 +301,8 @@ fun Pantalla7Search(
                     badge = "Negociable",
                     badgeColor = Color(0xFF3B82F6),
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0))
+                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0)),
+                    onClick = onProductClick
                 )
             }
         }
@@ -315,10 +322,11 @@ fun SearchProductCard(
     badge: String,
     badgeColor: Color,
     isFavorite: Boolean,
-    gradientColors: List<Color>
+    gradientColors: List<Color>,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        onClick = {},
+        onClick = onClick, // ← ESTO HACE QUE EL CARD SEA CLICKEABLE
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(

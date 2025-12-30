@@ -1,47 +1,36 @@
 package pe.edu.epis.alquicompra
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Preview
 @Composable
-fun Pantalla18Dashboard() {
+fun Pantalla18Dashboard(
+    onBackClick: () -> Unit,
+    onCreateListing: () -> Unit,
+    onManageListings: () -> Unit,
+    onProfile: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
+        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,35 +59,26 @@ fun Pantalla18Dashboard() {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .background(Color(0xFFEF4444), CircleShape),
+                        .background(Color(0xFFEF4444), CircleShape)
+                        .clickable { /* Notificaciones */ },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "🔔",
-                        fontSize = 18.sp
-                    )
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(Color(0xFFEF4444), CircleShape)
-                            .align(Alignment.TopEnd)
-                    )
+                    Text(text = "🔔", fontSize = 18.sp)
                 }
 
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .background(Color(0xFF93C5FD), CircleShape),
+                        .background(Color(0xFF93C5FD), CircleShape)
+                        .clickable(onClick = onProfile),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "👤",
-                        fontSize = 18.sp
-                    )
+                    Text(text = "👤", fontSize = 18.sp)
                 }
             }
         }
 
+        // Contenido
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -106,6 +86,7 @@ fun Pantalla18Dashboard() {
                 .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Banner de bienvenida
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,6 +111,7 @@ fun Pantalla18Dashboard() {
                 }
             }
 
+            // Tarjetas de estadísticas
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -148,10 +130,7 @@ fun Pantalla18Dashboard() {
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "📊",
-                            fontSize = 24.sp
-                        )
+                        Text(text = "📊", fontSize = 24.sp)
                         Row(
                             verticalAlignment = Alignment.Bottom,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -191,10 +170,7 @@ fun Pantalla18Dashboard() {
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "📅",
-                            fontSize = 24.sp
-                        )
+                        Text(text = "📅", fontSize = 24.sp)
                         Box(
                             modifier = Modifier
                                 .background(Color(0xFF1E3A8A), RoundedCornerShape(12.dp))
@@ -222,8 +198,9 @@ fun Pantalla18Dashboard() {
                 }
             }
 
+            // Botón publicar anuncio
             Button(
-                onClick = {},
+                onClick = onCreateListing,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -240,6 +217,7 @@ fun Pantalla18Dashboard() {
                 )
             }
 
+            // Gráfico de ingresos
             Text(
                 text = "Ingresos mensuales",
                 fontSize = 18.sp,
@@ -340,6 +318,7 @@ fun Pantalla18Dashboard() {
                 }
             }
 
+            // Gestión de anuncios
             Text(
                 text = "Mis anuncios",
                 fontSize = 18.sp,
@@ -348,7 +327,9 @@ fun Pantalla18Dashboard() {
             )
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onManageListings),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = Color(0xFFFAFAFA)

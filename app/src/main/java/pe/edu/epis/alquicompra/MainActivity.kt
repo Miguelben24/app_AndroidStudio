@@ -70,7 +70,17 @@ object Routes {
     const val FILTERS = "filters"
     const val FILTERS_CONFIRMATION = "filters_confirmation"
     const val ANIMATIONS_DEMO = "animations_demo"
+    const val PRODUCT_DETAIL = "product_detail"
+    const val PRODUCT_INFO = "product_info"
+    const val DATE_SELECTION = "date_selection"
+    const val PAYMENT = "payment"
+    const val CONFIRMATION = "confirmation"
+    const val MESSAGES = "messages"
+    const val PROFILE = "profile"              // NUEVO
+    const val HOST_DASHBOARD = "host_dashboard" // NUEVO
+    const val CREATE_LISTING = "create_listing" // NUEVO
 }
+
 
 // App principal con navegación
 @Composable
@@ -129,7 +139,6 @@ fun AlquiCompraApp() {
             Pantalla5Onboarding2(
                 onBackClick = { navController.popBackStack() },
                 onContinueClick = {
-                    // AQUÍ ESTÁ EL CAMBIO: Ahora va a REGISTER en vez de quedarse sin acción
                     navController.navigate(Routes.REGISTER)
                 }
             )
@@ -146,7 +155,6 @@ fun AlquiCompraApp() {
                 },
                 onRegisterClick = { navController.navigate(Routes.REGISTER) },
                 onSkipLogin = {
-                    // Continuar sin cuenta - va directo a HOME
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
@@ -164,7 +172,6 @@ fun AlquiCompraApp() {
                     }
                 },
                 onSkipRegister = {
-                    // Explorar sin cuenta - va directo a HOME
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
@@ -172,11 +179,13 @@ fun AlquiCompraApp() {
             )
         }
 
-        // HOME
+        // HOME - Actualizado con navegación a perfil
         composable(Routes.HOME) {
             Pantalla6Home(
                 onSearchClick = { navController.navigate(Routes.SEARCH) },
-                onAnimationsClick = { navController.navigate(Routes.ANIMATIONS_DEMO) }
+                onAnimationsClick = { navController.navigate(Routes.ANIMATIONS_DEMO) },
+                onProductClick = { navController.navigate(Routes.PRODUCT_DETAIL) },
+                onProfileClick = { navController.navigate(Routes.PROFILE) } // AGREGADO
             )
         }
 
@@ -185,7 +194,8 @@ fun AlquiCompraApp() {
             Pantalla7Search(
                 onBackClick = { navController.popBackStack() },
                 onMapViewClick = { navController.navigate(Routes.SEARCH_MAP) },
-                onFilterClick = { navController.navigate(Routes.FILTERS) }
+                onFilterClick = { navController.navigate(Routes.FILTERS) },
+                onProductClick = { navController.navigate(Routes.PRODUCT_DETAIL) }
             )
         }
 
@@ -194,7 +204,8 @@ fun AlquiCompraApp() {
             Pantalla8SearchMap(
                 onBackClick = { navController.popBackStack() },
                 onListViewClick = { navController.popBackStack() },
-                onFilterClick = { navController.navigate(Routes.FILTERS) }
+                onFilterClick = { navController.navigate(Routes.FILTERS) },
+                onProductClick = { navController.navigate(Routes.PRODUCT_DETAIL) }
             )
         }
 
@@ -229,6 +240,122 @@ fun AlquiCompraApp() {
         composable(Routes.ANIMATIONS_DEMO) {
             AnimationsDemoScreen(navController)
         }
+
+        // PRODUCT DETAIL (Pantalla 10)
+        composable(Routes.PRODUCT_DETAIL) {
+            Pantalla10ProductDetail(
+                onBackClick = { navController.popBackStack() },
+                onReserveClick = { navController.navigate(Routes.PRODUCT_INFO) },
+                onMessageClick = { navController.navigate(Routes.MESSAGES) }
+            )
+        }
+
+        // PRODUCT INFO (Pantalla 11)
+        composable(Routes.PRODUCT_INFO) {
+            Pantalla11ProductInfo(
+                onBackClick = { navController.popBackStack() },
+                onReserveClick = { navController.navigate(Routes.DATE_SELECTION) }
+            )
+        }
+
+        // DATE SELECTION (Pantalla 12)
+        composable(Routes.DATE_SELECTION) {
+            Pantalla12DateSelection(
+                onBackClick = { navController.popBackStack() },
+                onContinueClick = {
+                    navController.navigate(Routes.PAYMENT)
+                }
+            )
+        }
+
+        // PAYMENT (Pantalla 13)
+        composable(Routes.PAYMENT) {
+            Pantalla13Payment(
+                onBackClick = { navController.popBackStack() },
+                onPaymentComplete = {
+                    navController.navigate(Routes.CONFIRMATION) {
+                        popUpTo(Routes.HOME) { inclusive = false }
+                    }
+                }
+            )
+        }
+
+        // CONFIRMATION (Pantalla 14)
+        composable(Routes.CONFIRMATION) {
+            Pantalla14Confirmation(
+                onBackToHome = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.HOME) { inclusive = true }
+                    }
+                },
+                onContactHost = {
+                    navController.navigate(Routes.MESSAGES)
+                }
+            )
+        }
+
+        // MESSAGES (Pantalla 16)
+        composable(Routes.MESSAGES) {
+            Pantalla16Mensajes(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+
+// ... (todas las demás rutas que ya tienes) ...
+
+// PROFILE (Pantalla 17) - NUEVO
+        composable(Routes.PROFILE) {
+            Pantalla17Perfil(
+                onBackClick = { navController.popBackStack() },
+                onEditProfile = {
+                    // TODO: Implementar edición de perfil
+                },
+                onPaymentMethods = {
+                    // TODO: Implementar métodos de pago
+                },
+                onSettings = {
+                    // TODO: Implementar configuración
+                },
+                onHostDashboard = {
+                    navController.navigate(Routes.HOST_DASHBOARD)
+                },
+                onLogout = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+// HOST DASHBOARD (Pantalla 18) - NUEVO
+        composable(Routes.HOST_DASHBOARD) {
+            Pantalla18Dashboard(
+                onBackClick = { navController.popBackStack() },
+                onCreateListing = {
+                    navController.navigate(Routes.CREATE_LISTING)
+                },
+                onManageListings = {
+                    // TODO: Navegar a gestión de anuncios
+                },
+                onProfile = {
+                    navController.navigate(Routes.PROFILE)
+                }
+            )
+        }
+
+// CREATE LISTING (Pantalla 19) - NUEVO
+        composable(Routes.CREATE_LISTING) {
+            Pantalla19CrearAnuncio(
+                onBackClick = { navController.popBackStack() },
+                onCategorySelected = { category ->
+                    // TODO: Navegar al siguiente paso del formulario
+                    // Por ahora simplemente volver al dashboard
+                    navController.popBackStack()
+                }
+            )
+        }
+
     }
 }
 
@@ -723,7 +850,6 @@ fun AnimacionDemo3() {
         }
 
         Text(
-
             "Float animado: ${String.format("%.2f", animatedFloat)}",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium

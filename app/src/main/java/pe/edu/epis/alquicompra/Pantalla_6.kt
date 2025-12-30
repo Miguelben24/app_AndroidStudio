@@ -55,7 +55,9 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun Pantalla6Home(
     onSearchClick: () -> Unit = {},
-    onAnimationsClick: () -> Unit = {}
+    onAnimationsClick: () -> Unit = {},
+    onProductClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -270,7 +272,8 @@ fun Pantalla6Home(
                     rating = "4.8",
                     reviews = "12",
                     isFavorite = true,
-                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE))
+                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE)),
+                    onClick = onProductClick // ← AÑADIDO
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -283,7 +286,8 @@ fun Pantalla6Home(
                     rating = "4.5",
                     reviews = "8",
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0))
+                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0)),
+                    onClick = onProductClick // ← AÑADIDO
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -296,7 +300,8 @@ fun Pantalla6Home(
                     rating = "5.0",
                     reviews = "15",
                     isFavorite = false,
-                    gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF))
+                    gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF)),
+                    onClick = onProductClick // ← AÑADIDO
                 )
             }
         }
@@ -374,7 +379,10 @@ fun Pantalla6Home(
                 },
                 label = { Text("Perfil", fontSize = 10.sp) },
                 selected = selectedTab == 3,
-                onClick = { selectedTab = 3 },
+                onClick = {
+                    selectedTab = 3
+                    onProfileClick() // AGREGADO
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color(0xFF3B82F6),
                     selectedTextColor = Color(0xFF3B82F6),
@@ -426,10 +434,11 @@ fun ProductCard(
     rating: String,
     reviews: String,
     isFavorite: Boolean,
-    gradientColors: List<Color>
+    gradientColors: List<Color>,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        onClick = {},
+        onClick = onClick, // ← ESTO HACE QUE SEA CLICKEABLE
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(

@@ -15,14 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun Pantalla_13() {
+fun Pantalla13Payment(
+    onBackClick: () -> Unit,
+    onPaymentComplete: () -> Unit
+) {
     var pantallaActual by remember { mutableStateOf(1) } // 1, 2 o 3
 
     Column(
@@ -44,9 +45,9 @@ fun Pantalla_13() {
                 IconButton(
                     onClick = {
                         when(pantallaActual) {
+                            1 -> onBackClick()
                             2 -> pantallaActual = 1
                             3 -> pantallaActual = 2
-                            else -> { /* No hacer nada en pantalla 1 */ }
                         }
                     },
                     modifier = Modifier
@@ -87,7 +88,8 @@ fun Pantalla_13() {
                 onContinuar = { pantallaActual = 3 }
             )
             3 -> PantallaOpcionesPago(
-                onVolver = { pantallaActual = 2 }
+                onVolver = { pantallaActual = 2 },
+                onPagarAhora = onPaymentComplete
             )
         }
     }
@@ -432,7 +434,10 @@ fun PantallaFormularioTarjeta(onContinuar: () -> Unit) {
 }
 
 @Composable
-fun PantallaOpcionesPago(onVolver: () -> Unit) {
+fun PantallaOpcionesPago(
+    onVolver: () -> Unit,
+    onPagarAhora: () -> Unit
+) {
     var aceptoTerminos by remember { mutableStateOf(true) }
 
     Column(
@@ -526,7 +531,7 @@ fun PantallaOpcionesPago(onVolver: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = {},
+            onClick = onPagarAhora,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),

@@ -1,35 +1,14 @@
 package pe.edu.epis.alquicompra
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,14 +16,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun Pantalla11ProductDetail() {
+fun Pantalla10ProductDetail(
+    onBackClick: () -> Unit,
+    onReserveClick: () -> Unit,
+    onMessageClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +56,7 @@ fun Pantalla11ProductDetail() {
 
                 // Botón atrás
                 IconButton(
-                    onClick = {},
+                    onClick = onBackClick,
                     modifier = Modifier
                         .padding(16.dp)
                         .size(40.dp)
@@ -91,7 +72,7 @@ fun Pantalla11ProductDetail() {
 
                 // Botón compartir
                 IconButton(
-                    onClick = {},
+                    onClick = { /* Implementar compartir */ },
                     modifier = Modifier
                         .padding(16.dp)
                         .size(40.dp)
@@ -156,7 +137,7 @@ fun Pantalla11ProductDetail() {
                         )
 
                         IconButton(
-                            onClick = {},
+                            onClick = { /* Toggle favorito */ },
                             modifier = Modifier.size(32.dp)
                         ) {
                             Icon(
@@ -336,21 +317,11 @@ fun Pantalla11ProductDetail() {
                                     fontSize = 14.sp,
                                     color = Color(0xFF6B7280)
                                 )
-                                Text(
-                                    text = "•",
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF6B7280)
-                                )
-                                Text(
-                                    text = "Miembro desde 2023",
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF6B7280)
-                                )
                             }
                         }
 
                         OutlinedButton(
-                            onClick = {},
+                            onClick = onMessageClick,
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = Color(0xFF374151)
@@ -377,7 +348,7 @@ fun Pantalla11ProductDetail() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Button(
-                    onClick = {},
+                    onClick = onReserveClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -387,14 +358,14 @@ fun Pantalla11ProductDetail() {
                     )
                 ) {
                     Text(
-                        text = "Alquilar ahora",
+                        text = "Ver disponibilidad",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
 
                 OutlinedButton(
-                    onClick = {},
+                    onClick = onMessageClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

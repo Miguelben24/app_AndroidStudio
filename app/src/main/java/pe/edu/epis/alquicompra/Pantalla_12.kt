@@ -3,25 +3,30 @@ package pe.edu.epis.alquicompra
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun Pantalla_12() {
+fun Pantalla12DateSelection(
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit
+) {
+    var startDate by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
+    var selectedMonth by remember { mutableStateOf("Septiembre 2025") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,7 +44,7 @@ fun Pantalla_12() {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 IconButton(
-                    onClick = {},
+                    onClick = onBackClick,
                     modifier = Modifier
                         .size(40.dp)
                         .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
@@ -73,7 +78,9 @@ fun Pantalla_12() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Campos de fecha con mejor diseño
             Row(
@@ -87,14 +94,17 @@ fun Pantalla_12() {
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = startDate,
+                        onValueChange = { startDate = it },
                         label = {
                             Text(
                                 "Fecha de entrada",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280)
                             )
+                        },
+                        placeholder = {
+                            Text("DD/MM/AAAA", fontSize = 14.sp)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -114,14 +124,17 @@ fun Pantalla_12() {
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = endDate,
+                        onValueChange = { endDate = it },
                         label = {
                             Text(
                                 "Fecha de salida",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280)
                             )
+                        },
+                        placeholder = {
+                            Text("DD/MM/AAAA", fontSize = 14.sp)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -134,8 +147,6 @@ fun Pantalla_12() {
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             // Leyenda mejorada
             Row(
@@ -174,8 +185,6 @@ fun Pantalla_12() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             // Card del calendario
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -191,7 +200,7 @@ fun Pantalla_12() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = {},
+                            onClick = { /* Cambiar mes anterior */ },
                             modifier = Modifier
                                 .size(36.dp)
                                 .background(Color(0xFFF3F4F6), RoundedCornerShape(8.dp))
@@ -203,13 +212,13 @@ fun Pantalla_12() {
                             )
                         }
                         Text(
-                            text = "Septiembre 2025",
+                            text = selectedMonth,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF111827)
                         )
                         IconButton(
-                            onClick = {},
+                            onClick = { /* Cambiar mes siguiente */ },
                             modifier = Modifier
                                 .size(36.dp)
                                 .background(Color(0xFFF3F4F6), RoundedCornerShape(8.dp))
@@ -234,7 +243,7 @@ fun Pantalla_12() {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "📅 Calendario",
+                            text = "📅 Calendario interactivo",
                             fontSize = 16.sp,
                             color = Color(0xFF9CA3AF),
                             fontWeight = FontWeight.Medium
@@ -242,8 +251,6 @@ fun Pantalla_12() {
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             // Resumen de costos mejorado
             Card(
@@ -275,7 +282,7 @@ fun Pantalla_12() {
                             color = Color(0xFF6B7280)
                         )
                         Text(
-                            text = "Selecciona fechas",
+                            text = if (startDate.isNotEmpty() && endDate.isNotEmpty()) "2 días" else "Selecciona fechas",
                             fontSize = 15.sp,
                             color = Color(0xFF2563EB),
                             fontWeight = FontWeight.Medium
@@ -291,7 +298,7 @@ fun Pantalla_12() {
                             color = Color(0xFF6B7280)
                         )
                         Text(
-                            text = "S/ 0",
+                            text = "S/ 70",
                             fontSize = 15.sp,
                             color = Color(0xFF111827),
                             fontWeight = FontWeight.Medium
@@ -347,7 +354,7 @@ fun Pantalla_12() {
                             color = Color(0xFF111827)
                         )
                         Text(
-                            text = "S/ 150",
+                            text = "S/ 220",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF2563EB)
@@ -356,11 +363,9 @@ fun Pantalla_12() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
             // Botón Continuar mejorado
             Button(
-                onClick = {},
+                onClick = onContinueClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

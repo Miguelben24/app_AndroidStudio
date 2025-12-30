@@ -15,25 +15,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun Pantalla_14() {
+fun Pantalla14Confirmation(
+    onBackToHome: () -> Unit,
+    onContactHost: () -> Unit
+) {
     var pantallaActual by remember { mutableStateOf(1) }
 
     when(pantallaActual) {
         1 -> PantallaConfirmacion(
             onVerReserva = { pantallaActual = 2 },
-            onDescargarRecibo = { pantallaActual = 3 }
+            onDescargarRecibo = { pantallaActual = 3 },
+            onBackToHome = onBackToHome,
+            onContactHost = onContactHost
         )
         2 -> PantallaReservaCompleta(
-            onVolver = { pantallaActual = 1 }
+            onVolver = { pantallaActual = 1 },
+            onBackToHome = onBackToHome
         )
         3 -> PantallaRecibo(
-            onVolver = { pantallaActual = 1 }
+            onVolver = { pantallaActual = 1 },
+            onBackToHome = onBackToHome
         )
     }
 }
@@ -41,7 +46,9 @@ fun Pantalla_14() {
 @Composable
 fun PantallaConfirmacion(
     onVerReserva: () -> Unit,
-    onDescargarRecibo: () -> Unit
+    onDescargarRecibo: () -> Unit,
+    onBackToHome: () -> Unit,
+    onContactHost: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -322,7 +329,7 @@ fun PantallaConfirmacion(
             }
 
             Button(
-                onClick = {},
+                onClick = onContactHost,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -341,7 +348,7 @@ fun PantallaConfirmacion(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Compartir por WhatsApp",
+                    text = "Contactar host",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -372,6 +379,20 @@ fun PantallaConfirmacion(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+
+            OutlinedButton(
+                onClick = onBackToHome,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "Volver al inicio",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -380,7 +401,10 @@ fun PantallaConfirmacion(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaReservaCompleta(onVolver: () -> Unit) {
+fun PantallaReservaCompleta(
+    onVolver: () -> Unit,
+    onBackToHome: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -493,197 +517,14 @@ fun PantallaReservaCompleta(onVolver: () -> Unit) {
                 }
             }
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            Button(
+                onClick = onBackToHome,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Información del arrendador",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111827)
-                    )
-
-                    Divider(color = Color(0xFFE5E7EB))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(Color(0xFFFFA726), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "M",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
-                        Column {
-                            Text(
-                                text = "Maritza Quispe",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF111827)
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = null,
-                                    tint = Color(0xFFFFA726),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Text(
-                                    text = " 4.8 (23 reseñas)",
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF6B7280)
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    InfoRow("Teléfono:", "+51 9xx xxx xxx")
-                    InfoRow("Verificado:", "✓ Usuario verificado con DNI")
-                    InfoRow("Dirección:", "Jr. La Cultura 123, Puno")
-                }
-            }
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Desglose de pago",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111827)
-                    )
-
-                    Divider(color = Color(0xFFE5E7EB))
-
-                    InfoRow("Precio por noche:", "S/ 60.00")
-                    InfoRow("Número de noches:", "2")
-                    InfoRow("Subtotal:", "S/ 120.00")
-                    InfoRow("Depósito de garantía:", "S/ 100.00")
-                    InfoRow("Seguro opcional:", "S/ 0.00")
-                    InfoRow("Tarifa de servicio:", "S/ 10.00")
-
-                    Divider(color = Color(0xFFE5E7EB))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Total pagado:",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827)
-                        )
-                        Text(
-                            text = "S/ 230.00",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2196F3)
-                        )
-                    }
-
-                    Text(
-                        text = "* El depósito será devuelto tras la entrega del artículo en buen estado",
-                        fontSize = 12.sp,
-                        color = Color(0xFF6B7280),
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
-                }
-            }
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3CD))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.Top) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = Color(0xFF92400E),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column {
-                            Text(
-                                text = "Políticas importantes",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF92400E)
-                            )
-                            Text(
-                                text = "• Cancelación gratuita hasta 24h antes\n• Retraso en devolución: S/ 20 por día\n• Daños: se descontará del depósito",
-                                fontSize = 13.sp,
-                                color = Color(0xFF92400E)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedButton(
-                    onClick = {},
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF2196F3)
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Phone,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Contactar", fontSize = 14.sp)
-                }
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFEF4444)
-                    )
-                ) {
-                    Text("Cancelar reserva", fontSize = 14.sp)
-                }
+                Text("Volver al inicio", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -691,7 +532,10 @@ fun PantallaReservaCompleta(onVolver: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaRecibo(onVolver: () -> Unit) {
+fun PantallaRecibo(
+    onVolver: () -> Unit,
+    onBackToHome: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -770,63 +614,7 @@ fun PantallaRecibo(onVolver: () -> Unit) {
                         InfoRow("Fecha de emisión:", "18 Oct 2025, 10:30 AM")
                         InfoRow("Código de reserva:", "#ALQ-2025-0847")
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Detalles del cliente",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827)
-                        )
-
-                        InfoRow("Cliente:", "José Enrique")
-                        InfoRow("DNI:", "7xxxxxxx")
-                        InfoRow("Teléfono:", "+51 9xx xxx xxx")
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Detalles del arrendador",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827)
-                        )
-
-                        InfoRow("Arrendador:", "Maritza Quispe")
-                        InfoRow("DNI:", "4xxxxxxx")
-                        InfoRow("Dirección:", "Jr. La Cultura 123, Puno")
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Artículo",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827)
-                        )
-
-                        InfoRow("Producto:", "Carpa familiar")
-                        InfoRow("Periodo:", "10 Sep - 12 Sep 2025")
-                        InfoRow("Duración:", "2 noches")
-
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        Divider(color = Color(0xFFE5E7EB))
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = "Desglose de pago",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF111827)
-                        )
-
-                        InfoRow("Subtotal:", "S/ 120.00")
-                        InfoRow("Depósito de garantía:", "S/ 100.00")
-                        InfoRow("Tarifa de servicio:", "S/ 10.00")
-
-                        Spacer(modifier = Modifier.height(12.dp))
 
                         Divider(color = Color(0xFFE5E7EB), thickness = 2.dp)
 
@@ -850,38 +638,6 @@ fun PantallaRecibo(onVolver: () -> Unit) {
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        InfoRow("Método de pago:", "Tarjeta **** 5436")
-                        InfoRow("Estado:", "✓ Pagado")
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFF3F4F6)
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp)
-                            ) {
-                                Text(
-                                    text = "Nota:",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF374151)
-                                )
-                                Text(
-                                    text = "El depósito de garantía (S/ 100.00) será devuelto tras la devolución del artículo en buen estado dentro de 48 horas.",
-                                    fontSize = 11.sp,
-                                    color = Color(0xFF6B7)
-
-                                    )
-                            }
-                        }
-
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Column(
@@ -898,13 +654,6 @@ fun PantallaRecibo(onVolver: () -> Unit) {
                                 text = "Fomentando la economía circular en Puno",
                                 fontSize = 11.sp,
                                 color = Color(0xFF6B7280)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "www.alquicomprapuno.pe | soporte@alquicomprapuno.pe",
-                                fontSize = 10.sp,
-                                color = Color(0xFF9CA3AF),
-                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -939,46 +688,14 @@ fun PantallaRecibo(onVolver: () -> Unit) {
                 }
 
                 OutlinedButton(
-                    onClick = {},
+                    onClick = onBackToHome,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF6B7280)
-                    ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Compartir recibo",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-
-                OutlinedButton(
-                    onClick = {},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF6B7280)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Print,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Imprimir",
+                        text = "Volver al inicio",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )

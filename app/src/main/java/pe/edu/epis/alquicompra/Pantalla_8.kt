@@ -51,7 +51,8 @@ import androidx.compose.ui.unit.sp
 fun Pantalla8SearchMap(
     onBackClick: () -> Unit,
     onListViewClick: () -> Unit,
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    onProductClick: () -> Unit = {}
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedPin by remember { mutableIntStateOf(-1) }
