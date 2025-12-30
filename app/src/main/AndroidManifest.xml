@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AlquiCompra">
 
         <activity
-            android:name=".FiltrosActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AlquiCompra">
             <intent-filter>

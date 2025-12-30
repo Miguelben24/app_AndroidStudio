@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -42,14 +40,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun Pantalla7Search() {
+fun Pantalla7Search(
+    onBackClick: () -> Unit,
+    onMapViewClick: () -> Unit = {},
+    onFilterClick: () -> Unit = {}
+) {
     var searchQuery by remember { mutableStateOf("") }
     var isListView by remember { mutableStateOf(true) }
 
@@ -71,7 +71,7 @@ fun Pantalla7Search() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                IconButton(onClick = {}) {
+                IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Atrás",
@@ -103,7 +103,6 @@ fun Pantalla7Search() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -112,9 +111,8 @@ fun Pantalla7Search() {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     Card(
-                        onClick = {},
+                        onClick = onFilterClick,
                         shape = RoundedCornerShape(8.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFFF3F4F6)
@@ -134,7 +132,6 @@ fun Pantalla7Search() {
                         }
                     }
 
-
                     Card(
                         onClick = {},
                         shape = RoundedCornerShape(8.dp),
@@ -150,7 +147,6 @@ fun Pantalla7Search() {
                         )
                     }
                 }
-
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -172,24 +168,23 @@ fun Pantalla7Search() {
                     }
 
                     IconButton(
-                        onClick = { isListView = false },
+                        onClick = onMapViewClick,
                         modifier = Modifier
                             .size(40.dp)
                             .background(
-                                color = if (!isListView) Color(0xFFDBEAFE) else Color(0xFFF3F4F6),
+                                color = Color(0xFFF3F4F6),
                                 shape = RoundedCornerShape(8.dp)
                             )
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Place,
                             contentDescription = "Vista mapa",
-                            tint = if (!isListView) Color(0xFF3B82F6) else Color(0xFF6B7280)
+                            tint = Color(0xFF6B7280)
                         )
                     }
                 }
             }
         }
-
 
         Column(
             modifier = Modifier
@@ -197,7 +192,6 @@ fun Pantalla7Search() {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -217,11 +211,9 @@ fun Pantalla7Search() {
                 )
             }
 
-
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
                 SearchProductCard(
                     emoji = "💻",
                     title = "Laptop HP Pavilion 15\"",
@@ -235,7 +227,6 @@ fun Pantalla7Search() {
                     isFavorite = false,
                     gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE))
                 )
-
 
                 SearchProductCard(
                     emoji = "🪑",
@@ -251,7 +242,6 @@ fun Pantalla7Search() {
                     gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0))
                 )
 
-
                 SearchProductCard(
                     emoji = "📷",
                     title = "Cámara Canon EOS R6",
@@ -266,7 +256,6 @@ fun Pantalla7Search() {
                     gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF))
                 )
 
-
                 SearchProductCard(
                     emoji = "🎸",
                     title = "Guitarra acústica Yamaha",
@@ -279,6 +268,34 @@ fun Pantalla7Search() {
                     badgeColor = Color(0xFF10B981),
                     isFavorite = false,
                     gradientColors = listOf(Color(0xFFFECDD3), Color(0xFFFDA4AF))
+                )
+
+                SearchProductCard(
+                    emoji = "🎮",
+                    title = "PlayStation 5 con juegos",
+                    price = "S/ 50/día • Alquiler",
+                    description = "Incluye 2 controles y 5 juegos",
+                    distance = "1.5 km",
+                    rating = "4.9",
+                    reviews = "20",
+                    badge = "Muy popular",
+                    badgeColor = Color(0xFFF59E0B),
+                    isFavorite = false,
+                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE))
+                )
+
+                SearchProductCard(
+                    emoji = "🚲",
+                    title = "Bicicleta de montaña Trek",
+                    price = "S/ 450 • Venta",
+                    description = "Shimano 21 velocidades, frenos de disco",
+                    distance = "3.0 km",
+                    rating = "4.6",
+                    reviews = "9",
+                    badge = "Negociable",
+                    badgeColor = Color(0xFF3B82F6),
+                    isFavorite = false,
+                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0))
                 )
             }
         }
@@ -312,7 +329,6 @@ fun SearchProductCard(
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Imagen/Emoji
             Box(
                 modifier = Modifier
                     .size(96.dp)
@@ -322,7 +338,6 @@ fun SearchProductCard(
                 Text(text = emoji, fontSize = 48.sp)
             }
 
-            // Información del producto
             Column(
                 modifier = Modifier
                     .weight(1f)

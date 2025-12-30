@@ -2,6 +2,7 @@ package pe.edu.epis.alquicompra
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,14 +43,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun Pantalla8SearchMap() {
+fun Pantalla8SearchMap(
+    onBackClick: () -> Unit,
+    onListViewClick: () -> Unit,
+    onFilterClick: () -> Unit
+) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedPin by remember { mutableIntStateOf(-1) }
 
@@ -129,7 +131,7 @@ fun Pantalla8SearchMap() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                IconButton(onClick = {}) {
+                IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Atrás",
@@ -170,7 +172,7 @@ fun Pantalla8SearchMap() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Card(
-                        onClick = {},
+                        onClick = onFilterClick,
                         shape = RoundedCornerShape(8.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = Color(0xFFF3F4F6)
@@ -195,7 +197,7 @@ fun Pantalla8SearchMap() {
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     IconButton(
-                        onClick = {},
+                        onClick = onListViewClick,
                         modifier = Modifier
                             .size(40.dp)
                             .background(
@@ -357,10 +359,9 @@ fun MapPin(
                 color = Color.White,
                 shape = CircleShape
             )
-            .then(
-                Modifier.padding(0.dp)
-            ),
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
+        // Pin vacío
     }
 }

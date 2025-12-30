@@ -1,4 +1,3 @@
-
 package pe.edu.epis.alquicompra
 
 import androidx.compose.foundation.background
@@ -49,14 +48,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun Pantalla6Home() {
+fun Pantalla6Home(
+    onSearchClick: () -> Unit = {},
+    onAnimationsClick: () -> Unit = {}
+) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -71,7 +71,6 @@ fun Pantalla6Home() {
                 .background(Color.White)
                 .padding(24.dp)
         ) {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -104,7 +103,6 @@ fun Pantalla6Home() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -123,10 +121,19 @@ fun Pantalla6Home() {
                     focusedBorderColor = Color(0xFF3B82F6),
                     unfocusedContainerColor = Color(0xFFF3F4F6),
                     focusedContainerColor = Color.White
-                )
+                ),
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                    .also { interactionSource ->
+                        androidx.compose.runtime.LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect { interaction ->
+                                if (interaction is androidx.compose.foundation.interaction.PressInteraction.Release) {
+                                    onSearchClick()
+                                }
+                            }
+                        }
+                    }
             )
         }
-
 
         Column(
             modifier = Modifier
@@ -135,7 +142,6 @@ fun Pantalla6Home() {
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-
             Column {
                 Text(
                     text = "Acceso rápido",
@@ -149,7 +155,6 @@ fun Pantalla6Home() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-
                     Card(
                         onClick = {},
                         modifier = Modifier.weight(1f),
@@ -176,7 +181,6 @@ fun Pantalla6Home() {
                             )
                         }
                     }
-
 
                     Card(
                         onClick = {},
@@ -207,7 +211,6 @@ fun Pantalla6Home() {
                 }
             }
 
-
             Column {
                 Text(
                     text = "Categorías populares",
@@ -216,7 +219,6 @@ fun Pantalla6Home() {
                     color = Color(0xFF111827),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -229,7 +231,6 @@ fun Pantalla6Home() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -239,7 +240,6 @@ fun Pantalla6Home() {
                     CategoryCard("🔧", "Herramientas", Modifier.weight(1f))
                 }
             }
-
 
             Column {
                 Row(
@@ -262,7 +262,6 @@ fun Pantalla6Home() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
                 ProductCard(
                     emoji = "💻",
                     title = "Laptop HP Pavilion",
@@ -275,7 +274,6 @@ fun Pantalla6Home() {
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
-
 
                 ProductCard(
                     emoji = "🪑",
@@ -290,7 +288,6 @@ fun Pantalla6Home() {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
                 ProductCard(
                     emoji = "📷",
                     title = "Cámara Canon EOS",
@@ -303,7 +300,6 @@ fun Pantalla6Home() {
                 )
             }
         }
-
 
         NavigationBar(
             containerColor = Color.White,
@@ -337,7 +333,10 @@ fun Pantalla6Home() {
                 },
                 label = { Text("Buscar", fontSize = 10.sp) },
                 selected = selectedTab == 1,
-                onClick = { selectedTab = 1 },
+                onClick = {
+                    selectedTab = 1
+                    onSearchClick()
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color(0xFF3B82F6),
                     selectedTextColor = Color(0xFF3B82F6),
@@ -442,7 +441,6 @@ fun ProductCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
                     .size(64.dp)
@@ -454,7 +452,6 @@ fun ProductCard(
             }
 
             Spacer(modifier = Modifier.width(16.dp))
-
 
             Column(
                 modifier = Modifier.weight(1f)
@@ -479,7 +476,6 @@ fun ProductCard(
                 )
             }
 
-
             IconButton(
                 onClick = {},
                 modifier = Modifier
@@ -499,4 +495,3 @@ fun ProductCard(
         }
     }
 }
-///

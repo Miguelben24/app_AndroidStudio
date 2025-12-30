@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="pe.edu.epis.alquicompra" />
+                  <option name="mobileSdkAppId" value="1:746201808496:android:ed7c5bcc6990deac663eb5" />
+                  <option name="projectId" value="fir-alqui" />
+                  <option name="projectNumber" value="746201808496" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -2,6 +2,7 @@ package pe.edu.epis.alquicompra
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,23 +24,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Preview
 @Composable
-fun Pantalla9_5Filtros() {
+fun Pantalla9_5Filtros(
+    onCloseClick: () -> Unit,
+    onApplyFilters: () -> Unit
+) {
+    var selectedEstado by remember { mutableStateOf(setOf("Nuevo", "Buen estado")) }
+    var selectedRating by remember { mutableStateOf("4.5+") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Header
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,7 +63,7 @@ fun Pantalla9_5Filtros() {
                 color = Color(0xFF111827)
             )
 
-            IconButton(onClick = {}) {
+            IconButton(onClick = onCloseClick) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Cerrar",
@@ -70,7 +79,6 @@ fun Pantalla9_5Filtros() {
                 .background(Color(0xFFF3F4F6))
         )
 
-        // Contenido con scroll
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,7 +87,7 @@ fun Pantalla9_5Filtros() {
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // PRECIO
+
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Precio",
@@ -110,7 +118,7 @@ fun Pantalla9_5Filtros() {
                             contentAlignment = Alignment.CenterStart
                         ) {
                             Text(
-                                text = "145",
+                                text = "S/ 0",
                                 fontSize = 16.sp,
                                 color = Color(0xFF111827)
                             )
@@ -134,7 +142,7 @@ fun Pantalla9_5Filtros() {
                             contentAlignment = Alignment.CenterStart
                         ) {
                             Text(
-                                text = "S/1000",
+                                text = "S/ 1000",
                                 fontSize = 16.sp,
                                 color = Color(0xFF111827)
                             )
@@ -166,7 +174,6 @@ fun Pantalla9_5Filtros() {
                 )
             }
 
-            // FECHA DISPONIBLE
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Fecha disponible",
@@ -201,7 +208,7 @@ fun Pantalla9_5Filtros() {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "19/09/2025",
+                                    text = "22/12/2025",
                                     fontSize = 16.sp,
                                     color = Color(0xFF111827)
                                 )
@@ -231,7 +238,7 @@ fun Pantalla9_5Filtros() {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "11/10/2025",
+                                    text = "31/12/2025",
                                     fontSize = 16.sp,
                                     color = Color(0xFF111827)
                                 )
@@ -249,7 +256,6 @@ fun Pantalla9_5Filtros() {
                 )
             }
 
-            // DISTANCIA
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Distancia",
@@ -282,7 +288,6 @@ fun Pantalla9_5Filtros() {
                 }
             }
 
-            // ESTADO
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Estado",
@@ -296,86 +301,52 @@ fun Pantalla9_5Filtros() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Card(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFEF3C7)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("✨", fontSize = 16.sp)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Nuevo",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF92400E)
-                            )
-                        }
-                    }
+                    EstadoCard(
+                        emoji = "✨",
+                        label = "Nuevo",
+                        isSelected = selectedEstado.contains("Nuevo"),
+                        onClick = {
+                            selectedEstado = if (selectedEstado.contains("Nuevo")) {
+                                selectedEstado - "Nuevo"
+                            } else {
+                                selectedEstado + "Nuevo"
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
 
-                    Card(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFEF3C7)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("👍", fontSize = 16.sp)
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(
-                                text = "Buen estado",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF92400E)
-                            )
-                        }
-                    }
+                    EstadoCard(
+                        emoji = "👍",
+                        label = "Buen estado",
+                        isSelected = selectedEstado.contains("Buen estado"),
+                        onClick = {
+                            selectedEstado = if (selectedEstado.contains("Buen estado")) {
+                                selectedEstado - "Buen estado"
+                            } else {
+                                selectedEstado + "Buen estado"
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF3F4F6)
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("🔧", fontSize = 16.sp)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Necesita reparación",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF6B7280)
-                        )
-                    }
-                }
+                EstadoCard(
+                    emoji = "🔧",
+                    label = "Necesita reparación",
+                    isSelected = selectedEstado.contains("Necesita reparación"),
+                    onClick = {
+                        selectedEstado = if (selectedEstado.contains("Necesita reparación")) {
+                            selectedEstado - "Necesita reparación"
+                        } else {
+                            selectedEstado + "Necesita reparación"
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
-            // VALORACIÓN MÍNIMA
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Valoración mínima",
@@ -389,82 +360,26 @@ fun Pantalla9_5Filtros() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Card(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFEF3C7)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("⭐", fontSize = 16.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "3+",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF92400E)
-                            )
-                        }
-                    }
+                    RatingCard(
+                        rating = "3+",
+                        isSelected = selectedRating == "3+",
+                        onClick = { selectedRating = "3+" },
+                        modifier = Modifier.weight(1f)
+                    )
 
-                    Card(
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFEF3C7)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("⭐", fontSize = 16.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "4+",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF92400E)
-                            )
-                        }
-                    }
+                    RatingCard(
+                        rating = "4+",
+                        isSelected = selectedRating == "4+",
+                        onClick = { selectedRating = "4+" },
+                        modifier = Modifier.weight(1f)
+                    )
 
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .border(2.dp, Color(0xFF6366F1), RoundedCornerShape(8.dp)),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("⭐", fontSize = 16.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "4.5+",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF6366F1)
-                            )
-                        }
-                    }
+                    RatingCard(
+                        rating = "4.5+",
+                        isSelected = selectedRating == "4.5+",
+                        onClick = { selectedRating = "4.5+" },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -485,7 +400,6 @@ fun Pantalla9_5Filtros() {
             }
         }
 
-        // BOTONES
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -497,7 +411,11 @@ fun Pantalla9_5Filtros() {
                     .weight(1f)
                     .height(48.dp)
                     .background(Color.White, RoundedCornerShape(8.dp))
-                    .border(2.dp, Color(0xFF6366F1), RoundedCornerShape(8.dp)),
+                    .border(2.dp, Color(0xFF6366F1), RoundedCornerShape(8.dp))
+                    .clickable {
+                        selectedEstado = setOf()
+                        selectedRating = ""
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -512,7 +430,8 @@ fun Pantalla9_5Filtros() {
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp)
-                    .background(Color(0xFF6366F1), RoundedCornerShape(8.dp)),
+                    .background(Color(0xFF6366F1), RoundedCornerShape(8.dp))
+                    .clickable { onApplyFilters() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -522,6 +441,78 @@ fun Pantalla9_5Filtros() {
                     color = Color.White
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun EstadoCard(
+    emoji: String,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(0xFFFEF3C7) else Color(0xFFF3F4F6)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(emoji, fontSize = 16.sp)
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = label,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = if (isSelected) Color(0xFF92400E) else Color(0xFF6B7280)
+            )
+        }
+    }
+}
+
+@Composable
+fun RatingCard(
+    rating: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .then(
+                if (isSelected) Modifier.border(2.dp, Color(0xFF6366F1), RoundedCornerShape(8.dp))
+                else Modifier
+            )
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color.White else Color(0xFFFEF3C7)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("⭐", fontSize = 16.sp)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = rating,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = if (isSelected) Color(0xFF6366F1) else Color(0xFF92400E)
+            )
         }
     }
 }
