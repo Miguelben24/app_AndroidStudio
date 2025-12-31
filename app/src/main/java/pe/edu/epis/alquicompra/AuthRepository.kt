@@ -30,9 +30,6 @@ class AuthRepository(context: Context? = null) {
     // 🔍 SOLUCIÓN: Configuración correcta de Google Sign In
     val googleSignInClient: GoogleSignInClient? = context?.let {
         try {
-            // 📝 IMPORTANTE: Este Web Client ID debe venir de tu google-services.json
-            // Busca el archivo google-services.json en app/
-            // Copia el "client_id" que tiene "client_type": 3
 
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("746201808496-a364e45giuv34vck77ipujmu4hrt8ro4.apps.googleusercontent.com")
@@ -111,7 +108,7 @@ class AuthRepository(context: Context? = null) {
         }
     }
 
-    // 🔥 GOOGLE SIGN IN - CORREGIDO
+    // GOOGLE SIGN IN
     suspend fun signInWithGoogle(account: GoogleSignInAccount): Result<FirebaseUser> {
         return try {
             Log.d("AUTH_REPO", "=== GOOGLE SIGN IN ===")

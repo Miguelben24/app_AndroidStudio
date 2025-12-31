@@ -47,7 +47,7 @@ fun Pantalla17Perfil(
     var isLoading by remember { mutableStateOf(true) }
     var isRefreshing by remember { mutableStateOf(false) }
 
-    // 🔥 FUNCIÓN PARA CARGAR DATOS
+    //  FUNCIÓN PARA CARGAR DATOS
     fun loadUserData() {
         scope.launch {
             isRefreshing = true
@@ -78,15 +78,15 @@ fun Pantalla17Perfil(
         }
     }
 
-    // 🔥 CARGAR AL INICIO
+    // CARGAR AL INICIO
     LaunchedEffect(Unit) {
         loadUserData()
     }
 
-    // 🔥 RECARGAR CADA 3 SEGUNDOS (temporal para debug)
+    // RECARGAR CADA SEGUNDOS (temporal para debug)
     LaunchedEffect(Unit) {
         while (true) {
-            delay(3000)
+            delay(9000)
             Log.d("PERFIL_SCREEN", "🔄 Auto-recargando...")
             loadUserData()
         }
@@ -126,7 +126,7 @@ fun Pantalla17Perfil(
                         )
                     }
 
-                    // 🔥 BOTÓN DE REFRESCAR
+                    // BOTÓN DE REFRESCAR
                     IconButton(
                         onClick = { loadUserData() },
                         enabled = !isRefreshing

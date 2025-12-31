@@ -46,7 +46,7 @@ fun Pantalla7Search(
     var isLoading by remember { mutableStateOf(false) }
     var hasSearched by remember { mutableStateOf(false) }
 
-    // 🔥 CARGAR FAVORITOS
+    //CARGAR FAVORITOS
     fun loadFavorites() {
         scope.launch {
             favoritesRepository.getFavoriteIds().onSuccess { ids ->
@@ -55,7 +55,7 @@ fun Pantalla7Search(
         }
     }
 
-    // 🔥 CARGAR TODOS LOS PRODUCTOS (cuando no hay categoría)
+    // CARGAR TODOS LOS PRODUCTOS (cuando no hay categoría)
     LaunchedEffect(categoryFilter) {
         if (categoryFilter != null) {
             scope.launch {
@@ -70,7 +70,7 @@ fun Pantalla7Search(
                 }
             }
         } else {
-            // 🔥 SI NO HAY CATEGORÍA, CARGAR TODOS
+            // SI NO HAY CATEGORÍA, CARGAR TODOS
             scope.launch {
                 isLoading = true
                 hasSearched = true

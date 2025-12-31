@@ -32,14 +32,22 @@ fun Pantalla10ProductDetail(
 ) {
     val context = LocalContext.current
     val listingRepository = remember { ListingRepository(context) }
+    val favoritesRepository = remember { FavoritesRepository(context) }
     val scope = rememberCoroutineScope()
 
     var listing by remember { mutableStateOf<Listing?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var isFavorite by remember { mutableStateOf(false) }
 
-    // Cargar producto
+    // Cargar producto y estado de favorito
     LaunchedEffect(productId) {
         scope.launch {
+            // Verificar si es favorito
+            favoritesRepository.isFavorite(productId).onSuccess {
+                isFavorite = it
+            }
+            
+            // Cargar datos del producto
             listingRepository.getAllListings().onSuccess { listings ->
                 listing = listings.find { it.id == productId }
                 isLoading = false
@@ -177,13 +185,23 @@ fun Pantalla10ProductDetail(
                             )
 
                             IconButton(
-                                onClick = { /* Toggle favorito */ },
+                                onClick = {
+                                    scope.launch {
+                                        if (isFavorite) {
+                                            favoritesRepository.removeFavorite(productId)
+                                            isFavorite = false
+                                        } else {
+                                            favoritesRepository.addFavorite(productId)
+                                            isFavorite = true
+                                        }
+                                    }
+                                },
                                 modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.FavoriteBorder,
+                                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                     contentDescription = "Favorito",
-                                    tint = Color(0xFF9CA3AF)
+                                    tint = if (isFavorite) Color(0xFFEF4444) else Color(0xFF9CA3AF)
                                 )
                             }
                         }

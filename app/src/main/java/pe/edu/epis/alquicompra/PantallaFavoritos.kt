@@ -51,6 +51,7 @@ fun PantallaFavoritos(
         }
     }
 
+    // Se ejecuta al entrar y cada vez que cambia
     LaunchedEffect(Unit) {
         loadFavorites()
     }

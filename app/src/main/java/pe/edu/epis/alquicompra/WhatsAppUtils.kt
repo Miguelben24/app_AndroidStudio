@@ -47,9 +47,6 @@ object WhatsAppUtils {
         }
     }
 
-    /**
-     * Verifica si WhatsApp está instalado
-     */
     fun isWhatsAppInstalled(context: Context): Boolean {
         return try {
             context.packageManager.getPackageInfo("com.whatsapp", 0)

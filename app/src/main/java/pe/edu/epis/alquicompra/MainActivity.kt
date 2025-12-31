@@ -431,7 +431,7 @@ fun OnboardingScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFDBEAFE),
+                            Color(0xFFDBEAFF),
                             Color(0xFFBFDBFE)
                         )
                     )
@@ -439,7 +439,7 @@ fun OnboardingScreen(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val scale by animateFloatAsState(
+                val scale by animateFloatAsState( //efecto de rebote
                     targetValue = if (showIcons) 1f else 0f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioMediumBouncy,
