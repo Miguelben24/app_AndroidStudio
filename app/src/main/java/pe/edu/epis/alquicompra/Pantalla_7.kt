@@ -1,47 +1,29 @@
 package pe.edu.epis.alquicompra
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,24 +31,110 @@ fun Pantalla7Search(
     onBackClick: () -> Unit,
     onMapViewClick: () -> Unit = {},
     onFilterClick: () -> Unit = {},
-    onProductClick: () -> Unit = {}
+    onProductClick: (String) -> Unit = {},
+    categoryFilter: String? = null
 ) {
+    val context = LocalContext.current
+    val listingRepository = remember { ListingRepository(context) }
+    val favoritesRepository = remember { FavoritesRepository(context) }
+    val scope = rememberCoroutineScope()
+
     var searchQuery by remember { mutableStateOf("") }
     var isListView by remember { mutableStateOf(true) }
+    var listings by remember { mutableStateOf<List<Listing>>(emptyList()) }
+    var favoriteIds by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var isLoading by remember { mutableStateOf(false) }
+    var hasSearched by remember { mutableStateOf(false) }
+
+    // 🔥 CARGAR FAVORITOS
+    fun loadFavorites() {
+        scope.launch {
+            favoritesRepository.getFavoriteIds().onSuccess { ids ->
+                favoriteIds = ids
+            }
+        }
+    }
+
+    // 🔥 CARGAR TODOS LOS PRODUCTOS (cuando no hay categoría)
+    LaunchedEffect(categoryFilter) {
+        if (categoryFilter != null) {
+            scope.launch {
+                isLoading = true
+                hasSearched = true
+
+                listingRepository.getListingsByCategory(categoryFilter).onSuccess { loadedListings ->
+                    listings = loadedListings
+                    isLoading = false
+                }.onFailure {
+                    isLoading = false
+                }
+            }
+        } else {
+            // 🔥 SI NO HAY CATEGORÍA, CARGAR TODOS
+            scope.launch {
+                isLoading = true
+                hasSearched = true
+
+                listingRepository.getAllListings().onSuccess { allListings ->
+                    listings = allListings
+                    isLoading = false
+                }.onFailure {
+                    isLoading = false
+                }
+            }
+        }
+
+        loadFavorites()
+    }
+
+    // Función de búsqueda
+    fun performSearch(query: String) {
+        if (query.isNotBlank()) {
+            scope.launch {
+                isLoading = true
+                hasSearched = true
+
+                listingRepository.getAllListings().onSuccess { allListings ->
+                    listings = allListings.filter { listing ->
+                        listing.title.contains(query, ignoreCase = true) ||
+                                listing.description.contains(query, ignoreCase = true) ||
+                                listing.category.contains(query, ignoreCase = true)
+                    }
+                    isLoading = false
+                }.onFailure {
+                    isLoading = false
+                }
+            }
+        } else {
+            // Si borra la búsqueda, volver a mostrar todos
+            scope.launch {
+                isLoading = true
+                listingRepository.getAllListings().onSuccess { allListings ->
+                    listings = if (categoryFilter != null) {
+                        allListings.filter { it.category == categoryFilter }
+                    } else {
+                        allListings
+                    }
+                    isLoading = false
+                }.onFailure {
+                    isLoading = false
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF9FAFB))
     ) {
-
+        // Header
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White)
                 .padding(24.dp)
         ) {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -82,7 +150,12 @@ fun Pantalla7Search(
 
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = {
+                        searchQuery = it
+                        if (it.isEmpty()) {
+                            performSearch("")
+                        }
+                    },
                     modifier = Modifier.weight(1f),
                     placeholder = { Text("Buscar productos...") },
                     leadingIcon = {
@@ -92,13 +165,37 @@ fun Pantalla7Search(
                             tint = Color(0xFF9CA3AF)
                         )
                     },
+                    trailingIcon = {
+                        if (searchQuery.isNotEmpty()) {
+                            Row {
+                                IconButton(onClick = {
+                                    searchQuery = ""
+                                    performSearch("")
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Limpiar",
+                                        tint = Color(0xFF9CA3AF)
+                                    )
+                                }
+                                IconButton(onClick = { performSearch(searchQuery) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowForward,
+                                        contentDescription = "Buscar",
+                                        tint = Color(0xFF3B82F6)
+                                    )
+                                }
+                            }
+                        }
+                    },
                     shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color(0xFF3B82F6),
                         unfocusedContainerColor = Color(0xFFF3F4F6),
                         focusedContainerColor = Color.White
-                    )
+                    ),
+                    singleLine = true
                 )
             }
 
@@ -112,40 +209,37 @@ fun Pantalla7Search(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Card(
-                        onClick = onFilterClick,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFF3F4F6)
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(text = "🔧", fontSize = 16.sp)
-                            Text(
-                                text = "Filtros",
-                                fontSize = 14.sp,
-                                color = Color(0xFF111827)
+                    if (categoryFilter != null) {
+                        Card(
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFFDBEAFE)
                             )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = categoryFilter,
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF1E40AF),
+                                    fontWeight = FontWeight.Medium
+                                )
+                                IconButton(
+                                    onClick = onBackClick,
+                                    modifier = Modifier.size(16.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Quitar filtro",
+                                        tint = Color(0xFF1E40AF),
+                                        modifier = Modifier.size(12.dp)
+                                    )
+                                }
+                            }
                         }
-                    }
-
-                    Card(
-                        onClick = {},
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFF3F4F6)
-                        )
-                    ) {
-                        Text(
-                            text = "Ordenar",
-                            fontSize = 14.sp,
-                            color = Color(0xFF111827),
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
                     }
                 }
 
@@ -167,143 +261,86 @@ fun Pantalla7Search(
                             tint = if (isListView) Color(0xFF3B82F6) else Color(0xFF6B7280)
                         )
                     }
-
-                    IconButton(
-                        onClick = onMapViewClick,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = Color(0xFFF3F4F6),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Place,
-                            contentDescription = "Vista mapa",
-                            tint = Color(0xFF6B7280)
-                        )
-                    }
                 }
             }
         }
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        // Contenido
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "24 resultados encontrados",
-                    fontSize = 14.sp,
-                    color = Color(0xFF6B7280)
-                )
-                Text(
-                    text = "📍 Cerca de Puno",
-                    fontSize = 12.sp,
-                    color = Color(0xFF6B7280)
-                )
+                CircularProgressIndicator(color = Color(0xFF3B82F6))
             }
-
-            Column(
+        } else if (listings.isEmpty() && hasSearched) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(32.dp)
+                ) {
+                    Text(text = "😔", fontSize = 64.sp)
+                    Text(
+                        text = "No encontramos resultados",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF111827)
+                    )
+                    Text(
+                        text = "Intenta con otros términos de búsqueda",
+                        fontSize = 14.sp,
+                        color = Color(0xFF6B7280)
+                    )
+                }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SearchProductCard(
-                    emoji = "💻",
-                    title = "Laptop HP Pavilion 15\"",
-                    price = "S/ 25/día • Alquiler",
-                    description = "Intel i5, 8GB RAM, SSD 256GB",
-                    distance = "0.5 km",
-                    rating = "4.8",
-                    reviews = "12",
-                    badge = "Disponible",
-                    badgeColor = Color(0xFF10B981),
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE)),
-                    onClick = onProductClick // ← ESTO ES LO IMPORTANTE
-                )
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${listings.size} ${if (listings.size == 1) "resultado" else "resultados"}",
+                            fontSize = 14.sp,
+                            color = Color(0xFF6B7280)
+                        )
+                        Text(
+                            text = "📍 Cerca de Puno",
+                            fontSize = 12.sp,
+                            color = Color(0xFF6B7280)
+                        )
+                    }
+                }
 
-                SearchProductCard(
-                    emoji = "🪑",
-                    title = "Silla de oficina ergonómica",
-                    price = "S/ 150 • Venta",
-                    description = "Ajustable, soporte lumbar, como nueva",
-                    distance = "1.2 km",
-                    rating = "4.5",
-                    reviews = "8",
-                    badge = "Negociable",
-                    badgeColor = Color(0xFF3B82F6),
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0)),
-                    onClick = onProductClick
-                )
-
-                SearchProductCard(
-                    emoji = "📷",
-                    title = "Cámara Canon EOS R6",
-                    price = "S/ 40/día • Alquiler",
-                    description = "Incluye lente 24-70mm y trípode",
-                    distance = "2.1 km",
-                    rating = "5.0",
-                    reviews = "15",
-                    badge = "Muy popular",
-                    badgeColor = Color(0xFFF59E0B),
-                    isFavorite = true,
-                    gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF)),
-                    onClick = onProductClick
-                )
-
-                SearchProductCard(
-                    emoji = "🎸",
-                    title = "Guitarra acústica Yamaha",
-                    price = "S/ 280 • Venta",
-                    description = "FG800, excelente estado, con funda",
-                    distance = "0.8 km",
-                    rating = "4.7",
-                    reviews = "5",
-                    badge = "Disponible",
-                    badgeColor = Color(0xFF10B981),
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFFECDD3), Color(0xFFFDA4AF)),
-                    onClick = onProductClick
-                )
-
-                SearchProductCard(
-                    emoji = "🎮",
-                    title = "PlayStation 5 con juegos",
-                    price = "S/ 50/día • Alquiler",
-                    description = "Incluye 2 controles y 5 juegos",
-                    distance = "1.5 km",
-                    rating = "4.9",
-                    reviews = "20",
-                    badge = "Muy popular",
-                    badgeColor = Color(0xFFF59E0B),
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE)),
-                    onClick = onProductClick
-                )
-
-                SearchProductCard(
-                    emoji = "🚲",
-                    title = "Bicicleta de montaña Trek",
-                    price = "S/ 450 • Venta",
-                    description = "Shimano 21 velocidades, frenos de disco",
-                    distance = "3.0 km",
-                    rating = "4.6",
-                    reviews = "9",
-                    badge = "Negociable",
-                    badgeColor = Color(0xFF3B82F6),
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0)),
-                    onClick = onProductClick
-                )
+                items(listings) { listing ->
+                    SearchProductCard(
+                        listing = listing,
+                        isFavorite = favoriteIds.contains(listing.id),
+                        onClick = { onProductClick(listing.id) },
+                        onToggleFavorite = {
+                            scope.launch {
+                                if (favoriteIds.contains(listing.id)) {
+                                    favoritesRepository.removeFavorite(listing.id)
+                                } else {
+                                    favoritesRepository.addFavorite(listing.id)
+                                }
+                                loadFavorites()
+                            }
+                        }
+                    )
+                }
             }
         }
     }
@@ -312,21 +349,15 @@ fun Pantalla7Search(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchProductCard(
-    emoji: String,
-    title: String,
-    price: String,
-    description: String,
-    distance: String,
-    rating: String,
-    reviews: String,
-    badge: String,
-    badgeColor: Color,
-    isFavorite: Boolean,
-    gradientColors: List<Color>,
-    onClick: () -> Unit = {}
+    listing: Listing,
+    isFavorite: Boolean = false,
+    onClick: () -> Unit,
+    onToggleFavorite: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
     Card(
-        onClick = onClick, // ← ESTO HACE QUE EL CARD SEA CLICKEABLE
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
@@ -337,14 +368,14 @@ fun SearchProductCard(
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Box(
+            AsyncImage(
+                model = listing.imageUrl,
+                contentDescription = listing.title,
                 modifier = Modifier
                     .size(96.dp)
-                    .background(Brush.linearGradient(gradientColors)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = emoji, fontSize = 48.sp)
-            }
+                    .background(Color(0xFFF3F4F6)),
+                contentScale = ContentScale.Crop
+            )
 
             Column(
                 modifier = Modifier
@@ -358,19 +389,20 @@ fun SearchProductCard(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = title,
+                            text = listing.title,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF111827)
+                            color = Color(0xFF111827),
+                            maxLines = 2
                         )
                     }
 
                     IconButton(
-                        onClick = {},
+                        onClick = onToggleFavorite,
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
-                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
+                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Favorito",
                             tint = if (isFavorite) Color(0xFFEF4444) else Color(0xFF9CA3AF),
                             modifier = Modifier.size(20.dp)
@@ -379,17 +411,18 @@ fun SearchProductCard(
                 }
 
                 Text(
-                    text = price,
+                    text = "S/ ${listing.price}${if (listing.type == "alquiler") "/día" else ""}",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = if (price.contains("Alquiler")) Color(0xFF3B82F6) else Color(0xFF10B981),
+                    color = if (listing.type == "alquiler") Color(0xFF3B82F6) else Color(0xFF10B981),
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
 
                 Text(
-                    text = description,
+                    text = listing.description,
                     fontSize = 12.sp,
                     color = Color(0xFF6B7280),
+                    maxLines = 2,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
@@ -398,24 +431,50 @@ fun SearchProductCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "📍 $distance • ⭐ $rating ($reviews)",
-                        fontSize = 12.sp,
-                        color = Color(0xFF6B7280)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(badgeColor.copy(alpha = 0.1f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = badge,
-                            fontSize = 10.sp,
-                            color = badgeColor,
-                            fontWeight = FontWeight.Medium
+                            text = "📍 ${listing.location}",
+                            fontSize = 11.sp,
+                            color = Color(0xFF6B7280)
                         )
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    if (listing.type == "alquiler")
+                                        Color(0xFFDBEAFE)
+                                    else
+                                        Color(0xFFD1FAE5)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = listing.type.uppercase(),
+                                fontSize = 9.sp,
+                                color = if (listing.type == "alquiler")
+                                    Color(0xFF1E40AF)
+                                else
+                                    Color(0xFF065F46),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
+                            val message = "Hola! Me interesa tu producto: ${listing.title}"
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse("https://wa.me/${listing.userPhone}?text=${Uri.encode(message)}")
+                            }
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Text(text = "💬", fontSize = 18.sp)
                     }
                 }
             }

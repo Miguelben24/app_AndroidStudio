@@ -1,72 +1,65 @@
 package pe.edu.epis.alquicompra
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Pantalla6Home(
     onSearchClick: () -> Unit = {},
-    onAnimationsClick: () -> Unit = {},
-    onProductClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProductClick: (String) -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onCategoryClick: (String) -> Unit = {},
+    onFavoritesClick: () -> Unit = {}  // 🔥 NUEVA FUNCIÓN
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableIntStateOf(0) }
+    var firstName by remember { mutableStateOf("Usuario") }
+
+    val auth = FirebaseAuth.getInstance()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val authRepository = remember { AuthRepository(context) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            val result = authRepository.getUserProfile()
+            result.onSuccess { profile ->
+                firstName = profile.firstName.ifEmpty {
+                    profile.fullName.split(" ").firstOrNull() ?: "Usuario"
+                }
+            }.onFailure {
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    firstName = currentUser.displayName?.split(" ")?.firstOrNull() ?: "Usuario"
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF9FAFB))
     ) {
+        // Header
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -80,7 +73,7 @@ fun Pantalla6Home(
             ) {
                 Column {
                     Text(
-                        text = "¡Hola, María! 👋",
+                        text = "¡Hola, $firstName! 👋",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF111827)
@@ -144,6 +137,7 @@ fun Pantalla6Home(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            // Acceso rápido
             Column {
                 Text(
                     text = "Acceso rápido",
@@ -158,7 +152,7 @@ fun Pantalla6Home(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Card(
-                        onClick = {},
+                        onClick = { onSearchClick() },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(
@@ -168,7 +162,7 @@ fun Pantalla6Home(
                         Column(
                             modifier = Modifier.padding(16.dp)
                         ) {
-                            Text(text = "🏠", fontSize = 32.sp)
+                            Text(text = "🔄", fontSize = 32.sp)
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "Alquilar",
@@ -185,7 +179,7 @@ fun Pantalla6Home(
                     }
 
                     Card(
-                        onClick = {},
+                        onClick = { onSearchClick() },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(
@@ -213,6 +207,7 @@ fun Pantalla6Home(
                 }
             }
 
+            // Categorías populares
             Column {
                 Text(
                     text = "Categorías populares",
@@ -226,9 +221,15 @@ fun Pantalla6Home(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    CategoryCard("📱", "Electrónicos", Modifier.weight(1f))
-                    CategoryCard("🪑", "Muebles", Modifier.weight(1f))
-                    CategoryCard("👕", "Ropa", Modifier.weight(1f))
+                    CategoryCard("📱", "Electrónicos", Modifier.weight(1f)) {
+                        onCategoryClick("Electrónicos")
+                    }
+                    CategoryCard("🏠", "Viviendas", Modifier.weight(1f)) {
+                        onCategoryClick("Viviendas")
+                    }
+                    CategoryCard("👕", "Ropa", Modifier.weight(1f)) {
+                        onCategoryClick("Ropa")
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -237,75 +238,20 @@ fun Pantalla6Home(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    CategoryCard("⚽", "Deportes", Modifier.weight(1f))
-                    CategoryCard("📚", "Libros", Modifier.weight(1f))
-                    CategoryCard("🔧", "Herramientas", Modifier.weight(1f))
+                    CategoryCard("⚽", "Deportes", Modifier.weight(1f)) {
+                        onCategoryClick("Deportes")
+                    }
+                    CategoryCard("📚", "Libros", Modifier.weight(1f)) {
+                        onCategoryClick("Libros")
+                    }
+                    CategoryCard("🔧", "Herramientas", Modifier.weight(1f)) {
+                        onCategoryClick("Herramientas")
+                    }
                 }
-            }
-
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Destacados cerca de ti",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF111827)
-                    )
-                    Text(
-                        text = "Ver todos",
-                        fontSize = 14.sp,
-                        color = Color(0xFF3B82F6)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ProductCard(
-                    emoji = "💻",
-                    title = "Laptop HP Pavilion",
-                    price = "S/ 25/día • Alquiler",
-                    location = "0.5 km",
-                    rating = "4.8",
-                    reviews = "12",
-                    isFavorite = true,
-                    gradientColors = listOf(Color(0xFFDBEAFE), Color(0xFFBFDBFE)),
-                    onClick = onProductClick // ← AÑADIDO
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ProductCard(
-                    emoji = "🪑",
-                    title = "Silla de oficina ergonómica",
-                    price = "S/ 150 • Venta",
-                    location = "1.2 km",
-                    rating = "4.5",
-                    reviews = "8",
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFD1FAE5), Color(0xFFA7F3D0)),
-                    onClick = onProductClick // ← AÑADIDO
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ProductCard(
-                    emoji = "📷",
-                    title = "Cámara Canon EOS",
-                    price = "S/ 40/día • Alquiler",
-                    location = "2.1 km",
-                    rating = "5.0",
-                    reviews = "15",
-                    isFavorite = false,
-                    gradientColors = listOf(Color(0xFFF3E8FF), Color(0xFFE9D5FF)),
-                    onClick = onProductClick // ← AÑADIDO
-                )
             }
         }
 
+        // Bottom Navigation
         NavigationBar(
             containerColor = Color.White,
             tonalElevation = 8.dp
@@ -351,6 +297,7 @@ fun Pantalla6Home(
                 )
             )
 
+            // 🔥 FAVORITOS
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -360,10 +307,13 @@ fun Pantalla6Home(
                 },
                 label = { Text("Favoritos", fontSize = 10.sp) },
                 selected = selectedTab == 2,
-                onClick = { selectedTab = 2 },
+                onClick = {
+                    selectedTab = 2
+                    onFavoritesClick()
+                },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF3B82F6),
-                    selectedTextColor = Color(0xFF3B82F6),
+                    selectedIconColor = Color(0xFFEF4444),
+                    selectedTextColor = Color(0xFFEF4444),
                     unselectedIconColor = Color(0xFF9CA3AF),
                     unselectedTextColor = Color(0xFF9CA3AF),
                     indicatorColor = Color.Transparent
@@ -381,7 +331,7 @@ fun Pantalla6Home(
                 selected = selectedTab == 3,
                 onClick = {
                     selectedTab = 3
-                    onProfileClick() // AGREGADO
+                    onProfileClick()
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color(0xFF3B82F6),
@@ -396,9 +346,9 @@ fun Pantalla6Home(
 }
 
 @Composable
-fun CategoryCard(emoji: String, label: String, modifier: Modifier = Modifier) {
+fun CategoryCard(emoji: String, label: String, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     Card(
-        onClick = {},
+        onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
@@ -420,87 +370,6 @@ fun CategoryCard(emoji: String, label: String, modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF111827)
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProductCard(
-    emoji: String,
-    title: String,
-    price: String,
-    location: String,
-    rating: String,
-    reviews: String,
-    isFavorite: Boolean,
-    gradientColors: List<Color>,
-    onClick: () -> Unit = {}
-) {
-    Card(
-        onClick = onClick, // ← ESTO HACE QUE SEA CLICKEABLE
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Brush.linearGradient(gradientColors)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = emoji, fontSize = 32.sp)
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF111827)
-                )
-                Text(
-                    text = price,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (price.contains("Alquiler")) Color(0xFF3B82F6) else Color(0xFF10B981),
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                Text(
-                    text = "📍 A $location • ⭐ $rating ($reviews reseñas)",
-                    fontSize = 12.sp,
-                    color = Color(0xFF6B7280)
-                )
-            }
-
-            IconButton(
-                onClick = {},
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(
-                        color = if (isFavorite) Color(0xFFFEE2E2) else Color(0xFFF3F4F6),
-                        shape = CircleShape
-                    )
-            ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorito",
-                    tint = if (isFavorite) Color(0xFFEF4444) else Color(0xFF9CA3AF),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
         }
     }
 }

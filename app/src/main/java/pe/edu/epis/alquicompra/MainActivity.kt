@@ -13,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -21,10 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Tema centralizado
 @Composable
 fun AlquiCompraTheme(content: @Composable () -> Unit) {
     MaterialTheme(
@@ -57,7 +56,6 @@ fun AlquiCompraTheme(content: @Composable () -> Unit) {
     )
 }
 
-// Rutas de navegación
 object Routes {
     const val SPLASH = "splash"
     const val ONBOARDING = "onboarding"
@@ -66,23 +64,14 @@ object Routes {
     const val REGISTER = "register"
     const val HOME = "home"
     const val SEARCH = "search"
-    const val SEARCH_MAP = "search_map"
-    const val FILTERS = "filters"
-    const val FILTERS_CONFIRMATION = "filters_confirmation"
-    const val ANIMATIONS_DEMO = "animations_demo"
-    const val PRODUCT_DETAIL = "product_detail"
-    const val PRODUCT_INFO = "product_info"
-    const val DATE_SELECTION = "date_selection"
-    const val PAYMENT = "payment"
-    const val CONFIRMATION = "confirmation"
-    const val MESSAGES = "messages"
-    const val PROFILE = "profile"              // NUEVO
-    const val HOST_DASHBOARD = "host_dashboard" // NUEVO
-    const val CREATE_LISTING = "create_listing" // NUEVO
+    const val CATEGORY = "category/{categoryName}"
+    const val PRODUCT_DETAIL = "product_detail/{productId}"
+    const val PROFILE = "profile"
+    const val HOST_DASHBOARD = "host_dashboard"
+    const val CREATE_LISTING = "create_listing"
+    const val FAVORITES = "favorites"
 }
 
-
-// App principal con navegación
 @Composable
 fun AlquiCompraApp() {
     val navController = rememberNavController()
@@ -115,8 +104,7 @@ fun AlquiCompraApp() {
             ) + fadeOut(tween(300))
         }
     ) {
-        // SPLASH SCREEN
-        composable(Routes.SPLASH) {
+        composable(Routes.SPLASH) { //para que gire la bolita
             SplashScreen(
                 onNavigate = {
                     navController.navigate(Routes.ONBOARDING) {
@@ -126,7 +114,6 @@ fun AlquiCompraApp() {
             )
         }
 
-        // ONBOARDING 1
         composable(Routes.ONBOARDING) {
             OnboardingScreen(
                 onStartClick = { navController.navigate(Routes.ONBOARDING2) },
@@ -134,17 +121,13 @@ fun AlquiCompraApp() {
             )
         }
 
-        // ONBOARDING 2 - Personaliza tu experiencia
         composable(Routes.ONBOARDING2) {
             Pantalla5Onboarding2(
                 onBackClick = { navController.popBackStack() },
-                onContinueClick = {
-                    navController.navigate(Routes.REGISTER)
-                }
+                onContinueClick = { navController.navigate(Routes.REGISTER) }
             )
         }
 
-        // LOGIN
         composable(Routes.LOGIN) {
             Pantalla3Login(
                 onBackClick = { navController.popBackStack() },
@@ -162,7 +145,6 @@ fun AlquiCompraApp() {
             )
         }
 
-        // REGISTER
         composable(Routes.REGISTER) {
             Pantalla4Register(
                 onBackClick = { navController.popBackStack() },
@@ -179,190 +161,111 @@ fun AlquiCompraApp() {
             )
         }
 
-        // HOME - Actualizado con navegación a perfil
+        // HOME
         composable(Routes.HOME) {
             Pantalla6Home(
                 onSearchClick = { navController.navigate(Routes.SEARCH) },
-                onAnimationsClick = { navController.navigate(Routes.ANIMATIONS_DEMO) },
-                onProductClick = { navController.navigate(Routes.PRODUCT_DETAIL) },
-                onProfileClick = { navController.navigate(Routes.PROFILE) } // AGREGADO
+                onProductClick = { productId ->
+                    navController.navigate("product_detail/$productId")
+                },
+                onProfileClick = { navController.navigate(Routes.PROFILE) },
+                onCategoryClick = { category ->
+                    navController.navigate("category/$category")
+                },
+                onFavoritesClick = { navController.navigate(Routes.FAVORITES) }
             )
         }
 
-        // SEARCH (Lista)
+        // SEARCH - Sin categoría
         composable(Routes.SEARCH) {
             Pantalla7Search(
                 onBackClick = { navController.popBackStack() },
-                onMapViewClick = { navController.navigate(Routes.SEARCH_MAP) },
-                onFilterClick = { navController.navigate(Routes.FILTERS) },
-                onProductClick = { navController.navigate(Routes.PRODUCT_DETAIL) }
-            )
-        }
-
-        // SEARCH MAP (Vista de mapa)
-        composable(Routes.SEARCH_MAP) {
-            Pantalla8SearchMap(
-                onBackClick = { navController.popBackStack() },
-                onListViewClick = { navController.popBackStack() },
-                onFilterClick = { navController.navigate(Routes.FILTERS) },
-                onProductClick = { navController.navigate(Routes.PRODUCT_DETAIL) }
-            )
-        }
-
-        // FILTERS (Pantalla de filtros)
-        composable(Routes.FILTERS) {
-            Pantalla9_5Filtros(
-                onCloseClick = { navController.popBackStack() },
-                onApplyFilters = {
-                    navController.navigate(Routes.FILTERS_CONFIRMATION) {
-                        popUpTo(Routes.FILTERS) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // FILTERS CONFIRMATION
-        composable(Routes.FILTERS_CONFIRMATION) {
-            Pantalla9_5_2Confirmacion(
-                onOpenFilters = {
-                    navController.popBackStack()
-                    navController.navigate(Routes.FILTERS)
+                onProductClick = { productId ->
+                    navController.navigate("product_detail/$productId")
                 },
-                onContinue = {
-                    navController.navigate(Routes.SEARCH) {
-                        popUpTo(Routes.HOME) { inclusive = false }
-                    }
-                }
+                categoryFilter = null
             )
         }
 
-        // ANIMATIONS DEMO
-        composable(Routes.ANIMATIONS_DEMO) {
-            AnimationsDemoScreen(navController)
+        // CATEGORY - Con categoría específica
+        composable(
+            route = Routes.CATEGORY,
+            arguments = listOf(navArgument("categoryName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
+            Pantalla7Search(
+                onBackClick = { navController.popBackStack() },
+                onProductClick = { productId ->
+                    navController.navigate("product_detail/$productId")
+                },
+                categoryFilter = categoryName
+            )
         }
 
-        // PRODUCT DETAIL (Pantalla 10)
-        composable(Routes.PRODUCT_DETAIL) {
+        // PRODUCT DETAIL
+        composable(
+            route = Routes.PRODUCT_DETAIL,
+            arguments = listOf(navArgument("productId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: ""
             Pantalla10ProductDetail(
                 onBackClick = { navController.popBackStack() },
-                onReserveClick = { navController.navigate(Routes.PRODUCT_INFO) },
-                onMessageClick = { navController.navigate(Routes.MESSAGES) }
+                productId = productId
             )
         }
 
-        // PRODUCT INFO (Pantalla 11)
-        composable(Routes.PRODUCT_INFO) {
-            Pantalla11ProductInfo(
-                onBackClick = { navController.popBackStack() },
-                onReserveClick = { navController.navigate(Routes.DATE_SELECTION) }
-            )
-        }
-
-        // DATE SELECTION (Pantalla 12)
-        composable(Routes.DATE_SELECTION) {
-            Pantalla12DateSelection(
-                onBackClick = { navController.popBackStack() },
-                onContinueClick = {
-                    navController.navigate(Routes.PAYMENT)
-                }
-            )
-        }
-
-        // PAYMENT (Pantalla 13)
-        composable(Routes.PAYMENT) {
-            Pantalla13Payment(
-                onBackClick = { navController.popBackStack() },
-                onPaymentComplete = {
-                    navController.navigate(Routes.CONFIRMATION) {
-                        popUpTo(Routes.HOME) { inclusive = false }
-                    }
-                }
-            )
-        }
-
-        // CONFIRMATION (Pantalla 14)
-        composable(Routes.CONFIRMATION) {
-            Pantalla14Confirmation(
-                onBackToHome = {
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.HOME) { inclusive = true }
-                    }
-                },
-                onContactHost = {
-                    navController.navigate(Routes.MESSAGES)
-                }
-            )
-        }
-
-        // MESSAGES (Pantalla 16)
-        composable(Routes.MESSAGES) {
-            Pantalla16Mensajes(
-                onBackClick = { navController.popBackStack() }
-            )
-        }
-
-
-// ... (todas las demás rutas que ya tienes) ...
-
-// PROFILE (Pantalla 17) - NUEVO
+        // PROFILE
         composable(Routes.PROFILE) {
             Pantalla17Perfil(
                 onBackClick = { navController.popBackStack() },
-                onEditProfile = {
-                    // TODO: Implementar edición de perfil
-                },
-                onPaymentMethods = {
-                    // TODO: Implementar métodos de pago
-                },
-                onSettings = {
-                    // TODO: Implementar configuración
-                },
-                onHostDashboard = {
-                    navController.navigate(Routes.HOST_DASHBOARD)
-                },
+                onHostDashboard = { navController.navigate(Routes.HOST_DASHBOARD) },
                 onLogout = {
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
+                },
+                onProductClick = { productId ->
+                    navController.navigate("product_detail/$productId")
                 }
             )
         }
 
-// HOST DASHBOARD (Pantalla 18) - NUEVO
+        // HOST DASHBOARD
         composable(Routes.HOST_DASHBOARD) {
             Pantalla18Dashboard(
                 onBackClick = { navController.popBackStack() },
-                onCreateListing = {
-                    navController.navigate(Routes.CREATE_LISTING)
-                },
-                onManageListings = {
-                    // TODO: Navegar a gestión de anuncios
-                },
-                onProfile = {
-                    navController.navigate(Routes.PROFILE)
-                }
+                onCreateListing = { navController.navigate(Routes.CREATE_LISTING) },
+                onManageListings = { navController.navigate(Routes.PROFILE) },
+                onProfile = { navController.navigate(Routes.PROFILE) }
             )
         }
 
-// CREATE LISTING (Pantalla 19) - NUEVO
+        // CREATE LISTING
         composable(Routes.CREATE_LISTING) {
-            Pantalla19CrearAnuncio(
+            CreateListingFlow(
                 onBackClick = { navController.popBackStack() },
-                onCategorySelected = { category ->
-                    // TODO: Navegar al siguiente paso del formulario
-                    // Por ahora simplemente volver al dashboard
-                    navController.popBackStack()
+                onPublishComplete = {
+                    navController.navigate(Routes.PROFILE) {
+                        popUpTo(Routes.HOST_DASHBOARD) { inclusive = false }
+                    }
                 }
             )
         }
-
+        composable(Routes.FAVORITES) {
+            PantallaFavoritos(
+                onBackClick = { navController.popBackStack() },
+                onProductClick = { productId ->
+                    navController.navigate("product_detail/$productId")
+                }
+            )
+        }
     }
 }
 
 // ==================== SPLASH SCREEN ====================
 @Composable
 fun SplashScreen(onNavigate: () -> Unit) {
-    val infiniteTransition = rememberInfiniteTransition(label = "loader")
+    val infiniteTransition = rememberInfiniteTransition(label = "loader") //rueda de carga
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -556,14 +459,6 @@ fun OnboardingScreen(
                         Text(text = "💼", fontSize = 64.sp)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AnimatedIconCircle(emoji = "👥", color = Color(0xFFFBBF24), show = showIcons, delay = 0)
-                    AnimatedIconCircle(emoji = "🏠", color = Color(0xFF34D399), show = showIcons, delay = 100)
-                    AnimatedIconCircle(emoji = "📱", color = Color(0xFFA78BFA), show = showIcons, delay = 200)
-                }
             }
         }
 
@@ -624,241 +519,5 @@ fun OnboardingScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun AnimatedIconCircle(emoji: String, color: Color, show: Boolean, delay: Int) {
-    var visible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(show) {
-        if (show) {
-            delay(delay.toLong())
-            visible = true
-        }
-    }
-
-    val scale by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
-
-    Surface(
-        modifier = Modifier.size((32 * scale).dp),
-        shape = CircleShape,
-        color = color
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(text = emoji, fontSize = 16.sp)
-        }
-    }
-}
-
-// ==================== PANTALLA DE DEMOSTRACIONES ====================
-@Composable
-fun AnimationsDemoScreen(navController: NavHostController) {
-    var selectedDemo by remember { mutableStateOf(0) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Text("← Volver", fontSize = 16.sp, color = Color(0xFF3B82F6))
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            Text(
-                text = "Demo Animaciones",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(Modifier.weight(1f))
-        }
-
-        Divider()
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Button(
-                onClick = { selectedDemo = 0 },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedDemo == 0) Color(0xFF3B82F6) else Color(0xFFE5E7EB)
-                )
-            ) {
-                Text("Demo 1", color = if (selectedDemo == 0) Color.White else Color.Black)
-            }
-
-            Button(
-                onClick = { selectedDemo = 1 },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedDemo == 1) Color(0xFF3B82F6) else Color(0xFFE5E7EB)
-                )
-            ) {
-                Text("Demo 2", color = if (selectedDemo == 1) Color.White else Color.Black)
-            }
-
-            Button(
-                onClick = { selectedDemo = 2 },
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedDemo == 2) Color(0xFF3B82F6) else Color(0xFFE5E7EB)
-                )
-            ) {
-                Text("Demo 3", color = if (selectedDemo == 2) Color.White else Color.Black)
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            when (selectedDemo) {
-                0 -> AnimacionDemo1()
-                1 -> AnimacionDemo2()
-                2 -> AnimacionDemo3()
-            }
-        }
-    }
-}
-
-@Composable
-fun AnimacionDemo1() {
-    var showView by remember { mutableStateOf(true) }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        Text("AnimatedVisibility", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-
-        Button(onClick = { showView = !showView }) {
-            Text(if (showView) "Ocultar Vista" else "Mostrar Vista")
-        }
-
-        AnimatedVisibility(
-            visible = showView,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color(0xFF3B82F6), shape = MaterialTheme.shapes.medium),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("¡Vista Animada! 🎉", color = Color.White, fontSize = 20.sp)
-            }
-        }
-    }
-}
-
-@Composable
-fun AnimacionDemo2() {
-    var isSelected by remember { mutableStateOf(false) }
-
-    val animatedColor by animateColorAsState(
-        targetValue = if (isSelected) Color(0xFF3B82F6) else Color(0xFFEF4444),
-        animationSpec = tween(500)
-    )
-
-    val animatedSize by animateDpAsState(
-        targetValue = if (isSelected) 200.dp else 80.dp,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        Text("Color y Tamaño Animado", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-
-        Button(onClick = { isSelected = !isSelected }) {
-            Text(if (isSelected) "Desseleccionar" else "Seleccionar")
-        }
-
-        Box(
-            modifier = Modifier
-                .size(animatedSize)
-                .background(animatedColor, shape = MaterialTheme.shapes.medium),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                if (isSelected) "Grande 📦" else "Pequeño",
-                color = Color.White,
-                fontSize = if (isSelected) 24.sp else 14.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun AnimacionDemo3() {
-    var isSelected by remember { mutableStateOf(false) }
-
-    val animatedOffset by animateOffsetAsState(
-        targetValue = if (isSelected) Offset(100f, 100f) else Offset(0f, 0f),
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
-
-    val animatedFloat by animateFloatAsState(
-        targetValue = if (isSelected) 0f else 1f,
-        animationSpec = tween(1000)
-    )
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        Text("Offset y Float Animado", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-
-        Button(onClick = { isSelected = !isSelected }) {
-            Text("Animar Posición")
-        }
-
-        Box(
-            modifier = Modifier
-                .offset(animatedOffset.x.dp, animatedOffset.y.dp)
-                .size(100.dp)
-                .background(Color(0xFF10B981), shape = MaterialTheme.shapes.medium),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("Moviendo 🚀", color = Color.White)
-        }
-
-        Text(
-            "Float animado: ${String.format("%.2f", animatedFloat)}",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-
-        LinearProgressIndicator(
-            progress = animatedFloat,
-            modifier = Modifier.fillMaxWidth().height(8.dp),
-            color = Color(0xFF3B82F6)
-        )
     }
 }

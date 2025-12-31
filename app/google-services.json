@@ -12,7 +12,12 @@
           "package_name": "pe.edu.epis.alquicompra"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "746201808496-a364e45giuv34vck77ipujmu4hrt8ro4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAQARn1zsyPOWOhzYYrH1S7Wjy6GuwghQw"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746201808496-a364e45giuv34vck77ipujmu4hrt8ro4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
